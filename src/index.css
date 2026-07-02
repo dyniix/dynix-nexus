@@ -1,87 +1,598 @@
 @import "tailwindcss";
 
-/*
-  Fonts loaded via system stack by default (platform-agnostic).
-  When bundling for Tauri, replace with @font-face declarations
-  pointing to bundled font files in /public/fonts/.
-*/
-
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
 
-  --color-nexus-900: #050505;
-  --color-nexus-800: #0a0a0f;
-  --color-nexus-700: #12121a;
-  --color-nexus-600: #1a1a26;
-  --color-nexus-500: #2a2a3a;
-  --color-nexus-400: #6b6b80;
-  --color-nexus-300: #9ca3af;
-  --color-nexus-200: #d1d5db;
-  --color-nexus-100: #f3f4f6;
+  --color-nexus-900: #080808;
+  --color-nexus-800: #111111;
+  --color-nexus-700: #181818;
+  --color-nexus-600: #222222;
+  --color-nexus-500: #333333;
+  --color-nexus-400: rgba(255,255,255,0.45);
+  --color-nexus-300: rgba(255,255,255,0.65);
+  --color-nexus-200: rgba(255,255,255,0.8);
+  --color-nexus-100: rgba(255,255,255,0.9);
 
   --color-cyan-500: #038fa4;
-  --color-cyan-400: #05b3cc;
+  --color-cyan-400: #00D9FF;
+  --color-cyan-300: #42E8FF;
   --color-cyan-600: #026d7d;
 
-  --color-accent: #3b82f6;
-  --color-success: #22c55e;
-  --color-warning: #eab308;
-  --color-danger: #ef4444;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
 
   --ease-nexus: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html { height: 100%; }
+
 body {
+  height: 100%;
   margin: 0;
-  background: var(--color-nexus-900);
+  background: #080808;
   color: var(--color-nexus-300);
   font-family: var(--font-sans);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.65;
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
 }
 
+/* ── Engineered Background V2 ──
+   Ten-layer system. Never decorative — always the visual identity of the runtime.
+   Layers (bottom→top):
+     1  Base          #08090A + subtle radial
+     2  Noise         Ultra-light film grain 1.5%
+     3  Blueprint     CAD-inspired guide lines (sparse, mixed angles)
+     4  Network       Nexus SVG (nodes, connections, animateMotion packets)
+     5  Pulse         Soft cyan energy field near Dynamic Island
+     6  Coordinates   Tiny engineering markers (X:042, GRID-A3, etc.)
+     7  Ambient       Multiple light sources behind active elements
+     8  Depth         Parallax via useMouseParallax hook (1–2px)
+     9  Dynamic       Runtime-reactive pulses (state-driven)
+    10  Constraints   No hexagons, neon, RGB, particles, circuit boards
+────────────────────────────────────────────────────────────────── */
+
+.bg-engineered {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Layer 1 — Base: #08090A + top-brighter radial gradient */
+.bg-layer-base {
+  position: absolute;
+  inset: 0;
+  background: #08090A;
+}
+.bg-layer-base::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% -5%, rgba(255, 255, 255, 0.012) 0%, transparent 65%);
+}
+
+/* Layer 2 — Noise: premium film grain at 2% */
+.bg-layer-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* Layer 2b — Premium paper/canvas texture (ultra-subtle) */
+.bg-layer-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events: none;
+}
+
+/* Layer 3 — (replaced by bg-blueprint-irregular) */
+
+/* Layer 5 — Runtime Pulse: soft cyan glow near Dynamic Island */
+.bg-layer-pulse {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: 600px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(0, 217, 255, 0.025) 0%, transparent 70%);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* Layer 7 — Ambient: multiple tiny light sources */
+.bg-layer-ambient {
+  position: absolute;
+  inset: 0;
+  background:
+    /* Behind Dynamic Island */
+    radial-gradient(circle 140px at 50% 28px, rgba(0, 217, 255, 0.02) 0%, transparent 100%),
+    /* Behind sidebar */
+    radial-gradient(circle 100px at 28px 50%, rgba(0, 217, 255, 0.014) 0%, transparent 100%),
+    /* Behind active panel (center-right) */
+    radial-gradient(circle 200px at 65% 60%, rgba(34, 197, 94, 0.008) 0%, transparent 100%),
+    /* Bottom-right accent */
+    radial-gradient(circle 160px at 85% 85%, rgba(0, 217, 255, 0.006) 0%, transparent 100%);
+}
+
+/* ── Vignette: darker edges, brighter center (adds depth) ── */
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(0, 0, 0, 0.35) 100%);
+  z-index: 2;
+}
+
+/* ── Living Pipeline: animated packet + stage glow ── */
+
+.pipeline-track {
+  position: relative;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 1px;
+  margin: 28px 16px 32px;
+  overflow: visible;
+}
+
+.pipeline-packet {
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #00D9FF;
+  box-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+  margin-top: -2.5px;
+  animation: pipeline-travel 4.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes pipeline-travel {
+  0%   { left: -6px; opacity: 0; }
+  4%   { opacity: 1; }
+  22%  { left: calc(25% - 3px); }
+  27%  { left: calc(25% - 3px); }
+  47%  { left: calc(50% - 3px); }
+  52%  { left: calc(50% - 3px); }
+  72%  { left: calc(75% - 3px); }
+  77%  { left: calc(75% - 3px); }
+  96%  { left: calc(100% - 6px); opacity: 1; }
+  100% { left: calc(100% - 6px); opacity: 0; }
+}
+
+.pipeline-stage {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.pipeline-stage-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  background: rgba(0, 217, 255, 0.04);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.pipeline-stage.active .pipeline-stage-glow {
+  opacity: 1;
+}
+
+/* Stage glow animations synchronized with pipeline-travel */
+@keyframes stage-glow-1 {
+  0%, 18% { opacity: 0.08; background: rgba(0, 217, 255, 0.06); }
+  22%, 100% { opacity: 0; background: transparent; }
+}
+@keyframes stage-glow-2 {
+  0%, 22% { opacity: 0; background: transparent; }
+  27%, 43% { opacity: 0.08; background: rgba(0, 217, 255, 0.06); }
+  47%, 100% { opacity: 0; background: transparent; }
+}
+@keyframes stage-glow-3 {
+  0%, 47% { opacity: 0; background: transparent; }
+  52%, 68% { opacity: 0.08; background: rgba(0, 217, 255, 0.06); }
+  72%, 100% { opacity: 0; background: transparent; }
+}
+@keyframes stage-glow-4 {
+  0%, 72% { opacity: 0; background: transparent; }
+  77%, 92% { opacity: 0.08; background: rgba(0, 217, 255, 0.06); }
+  96%, 100% { opacity: 0; background: transparent; }
+}
+
+.stage-glow-1 { animation: stage-glow-1 4.5s ease infinite; }
+.stage-glow-2 { animation: stage-glow-2 4.5s ease infinite; }
+.stage-glow-3 { animation: stage-glow-3 4.5s ease infinite; }
+.stage-glow-4 { animation: stage-glow-4 4.5s ease infinite; }
+
+/* ── Sidebar Dock — Permanent Operating Dock ──
+     Dark layered surface. Very subtle glass. Soft inner highlight.
+     Floating. Rounded. Soft shadow. Tiny cyan reflections.      */
+
+.sidebar-dock {
+  width: 82px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  border-radius: 30px;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.95) 0%,
+    rgba(10, 10, 10, 0.98) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 16px 64px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    0 1px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Procedural noise overlay */
+.sidebar-dock::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Tiny cyan edge reflection */
+.sidebar-dock::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 217, 255, 0.06) 30%,
+    rgba(0, 217, 255, 0.06) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ── Sidebar Logo ── */
+.sidebar-logo {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(0, 217, 255, 0.05);
+  border: 1px solid rgba(0, 217, 255, 0.06);
+  flex-shrink: 0;
+  animation: sidebar-logo-breathe 6s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes sidebar-logo-breathe {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 217, 255, 0.03); border-color: rgba(0, 217, 255, 0.06); }
+  50%      { box-shadow: 0 0 14px rgba(0, 217, 255, 0.08); border-color: rgba(0, 217, 255, 0.10); }
+}
+
+@keyframes sidebar-logo-sweep {
+  0%, 93%  { transform: translateX(-100%) skewX(-15deg); opacity: 0; }
+  94%      { opacity: 0.3; }
+  100%     { transform: translateX(250%) skewX(-15deg); opacity: 0; }
+}
+
+.sidebar-logo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.04) 50%, transparent);
+  animation: sidebar-logo-sweep 12s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Sidebar Dock Separator ── */
+.sidebar-dock-sep {
+  width: 32px;
+  height: 1px;
+  margin: 16px 0;
+  flex-shrink: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.025) 20%,
+    rgba(255, 255, 255, 0.025) 80%,
+    transparent 100%
+  );
+}
+
+/* ── Sidebar Panel — Context Module Panel ──
+     One continuous premium surface. Shares material with sidebar dock. */
+
+.sidebar-panel {
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.95) 0%,
+    rgba(10, 10, 10, 0.98) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 32px 80px rgba(0, 0, 0, 0.55),
+    0 12px 32px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.25);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sidebar-panel::-webkit-scrollbar { display: none; }
+
+/* ── Panel Section Label ── */
+.sidebar-panel-section-label {
+  padding: 0 20px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ── Panel Separator ── */
+.sidebar-panel-sep {
+  height: 1px;
+  margin: 0 20px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.02) 15%,
+    rgba(255, 255, 255, 0.02) 85%,
+    transparent 100%
+  );
+  flex-shrink: 0;
+}
+
+/* ── Panel Item ── */
+.sidebar-panel-item {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding: 0 20px;
+  height: 48px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.24);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  text-align: left;
+  align-items: flex-start;
+  padding-top: 9px;
+  flex-shrink: 0;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.sidebar-panel-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.sidebar-panel-item.system {
+  height: 40px;
+  padding-top: 0;
+  align-items: center;
+}
+
+/* ── Glass Utilities ── */
+
 .dynix-glow {
-  box-shadow: 0 0 20px rgba(3, 143, 164, 0.1), 0 0 40px rgba(3, 143, 164, 0.05);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.06), 0 0 40px rgba(0, 217, 255, 0.03);
 }
 
 .dynix-glow-intense {
-  box-shadow: 0 0 30px rgba(3, 143, 164, 0.2), 0 0 60px rgba(3, 143, 164, 0.1);
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.1), 0 0 60px rgba(0, 217, 255, 0.05);
+}
+
+.dynix-glow-breathing {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
 
 .dynix-glass {
-  background: rgba(18, 18, 26, 0.6);
-  backdrop-filter: blur(24px);
+  background: rgba(17, 17, 17, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .dynix-glass-strong {
-  background: rgba(18, 18, 26, 0.85);
-  backdrop-filter: blur(32px);
+  background: rgba(17, 17, 17, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* ── Floating Panel — borderless, depth via shadow ── */
+
+.dynix-floating-panel {
+  background: rgba(24, 24, 24, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.15);
+  outline: 1px solid rgba(255, 255, 255, 0.03);
+  outline-offset: -1px;
+}
+
+.dynix-floating-panel-subtle {
+  background: rgba(24, 24, 24, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  box-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  outline: 1px solid rgba(255, 255, 255, 0.025);
+  outline-offset: -1px;
+}
+
+/* ── Packet Travel Animation ── */
+
+@keyframes packet-travel {
+  0% { left: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: calc(100% - 4px); opacity: 0; }
+}
+
+@keyframes packet-travel-delayed-1 {
+  0% { left: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: calc(100% - 4px); opacity: 0; }
+}
+
+@keyframes packet-travel-delayed-2 {
+  0% { left: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: calc(100% - 4px); opacity: 0; }
+}
+
+/* ── Terminal Feed ── */
+
+.dynix-terminal-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 2px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* ── Sidebar Vertical Line ── */
+
+.dynix-sidebar-active-line {
+  position: absolute;
+  right: -1px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 1px;
+  background: #00D9FF;
+  box-shadow: 0 0 6px rgba(0, 217, 255, 0.4);
+  animation: sidebar-line-breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes sidebar-line-breathe {
+  0%, 100% { opacity: 0.35; box-shadow: 0 0 4px rgba(0, 217, 255, 0.2); }
+  50% { opacity: 1; box-shadow: 0 0 8px rgba(0, 217, 255, 0.5); }
+}
+
+/* ── Section Header ── */
+
+.dynix-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dynix-section-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dynix-section-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-nexus-100);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.dynix-section-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-nexus-400);
+  max-width: 420px;
+}
+
+.dynix-section-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dynix-section-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dynix-section-status-label {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Animations ── */
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(0, 217, 255, 0.04), 0 0 20px rgba(0, 217, 255, 0.02); }
+  50% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.08), 0 0 40px rgba(0, 217, 255, 0.04); }
+}
+
 @keyframes breathe {
-  0%, 100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(3, 143, 164, 0.1); }
-  50% { box-shadow: 0 0 25px rgba(3, 143, 164, 0.25); }
-}
-
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -90,19 +601,92 @@ body {
   to { width: 100%; }
 }
 
-::-webkit-scrollbar {
-  width: 4px;
+/* ── Premium Glass (higher blur, softer shadow, cyan edge) ── */
+
+.dynix-glass-premium {
+  background: rgba(17, 17, 17, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 217, 255, 0.06);
+  box-shadow:
+    0 8px 48px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(0, 0, 0, 0.15);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* ── Background: Irregular Blueprint Lines (SVG-based) ── */
+
+.bg-blueprint-irregular {
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 800'%3E%3Cg stroke='rgba(0,217,255,0.5)' stroke-width='0.5' fill='none'%3E%3Cline x1='120' y1='80' x2='580' y2='320' /%3E%3Cline x1='580' y1='320' x2='340' y2='640' /%3E%3Cline x1='340' y1='640' x2='120' y2='80' /%3E%3Cline x1='780' y1='120' x2='920' y2='500' /%3E%3Cline x1='920' y1='500' x2='650' y2='720' /%3E%3Cline x1='650' y1='720' x2='780' y2='120' /%3E%3Cline x1='200' y1='500' x2='750' y2='180' /%3E%3Cline x1='420' y1='100' x2='820' y2='600' /%3E%3Cline x1='80' y1='650' x2='400' y2='200' /%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-nexus-500);
-  border-radius: 2px;
+/* ── Atmospheric Lighting ── */
+
+.bg-atm-island {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  translate: -50% 0;
+  width: 600px;
+  height: 300px;
+  background: radial-gradient(ellipse at 50% 20%, rgba(0, 217, 255, 0.025) 0%, transparent 65%);
+  pointer-events: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-nexus-400);
+.bg-atm-workspace {
+  position: absolute;
+  top: 12%;
+  left: 25%;
+  width: 500px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(0, 217, 255, 0.015) 0%, transparent 60%);
+  pointer-events: none;
 }
+
+.bg-atm-flow {
+  position: absolute;
+  top: 45%;
+  right: 10%;
+  width: 400px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(34, 197, 94, 0.008) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ── Nexus Network Hub Breathing ── */
+@keyframes nexus-hub-breathe {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.18; }
+}
+.nexus-hub-breathe {
+  animation: nexus-hub-breathe 4s ease-in-out infinite;
+}
+
+/* ── Creator Badge Breathing ── */
+@keyframes creator-breathe {
+  0%, 100% {
+    border-color: rgba(0, 217, 255, 0.08);
+    box-shadow: 0 0 4px rgba(0, 217, 255, 0.02);
+  }
+  50% {
+    border-color: rgba(0, 217, 255, 0.18);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.06);
+  }
+}
+
+/* ── Waveform Bounce Animation ── */
+@keyframes waveform-bounce {
+  0%, 100% { transform: scaleY(0.6); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 0.9; }
+}
+
+/* ── Scrollbar ── */
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-nexus-500); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-nexus-400); }
