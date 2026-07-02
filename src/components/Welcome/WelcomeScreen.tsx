@@ -2,9 +2,9 @@ import { motion } from 'motion/react'
 
 export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-nexus-900 px-6">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-nexus-900">
       <motion.div
-        className="text-center max-w-lg"
+        className="text-center max-w-lg px-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
@@ -49,7 +49,7 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          Enter Workspace
+          Explore Workspace
         </motion.button>
 
         <motion.div
@@ -58,7 +58,7 @@ export default function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
         >
-          v0.1.0 | dynix
+          v0.1 Alpha | Built by Dynix
         </motion.div>
       </motion.div>
     </div>

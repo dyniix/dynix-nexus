@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
+/*
+  Fonts loaded via system stack by default (platform-agnostic).
+  When bundling for Tauri, replace with @font-face declarations
+  pointing to bundled font files in /public/fonts/.
+*/
+
 @theme {
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
 
   --color-nexus-900: #050505;
   --color-nexus-800: #0a0a0f;

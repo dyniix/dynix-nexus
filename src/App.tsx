@@ -13,7 +13,7 @@ export default function App() {
     setPhase('welcome')
   }, [])
 
-  const handleEnter = useCallback(() => {
+  const handleEnterWorkspace = useCallback(() => {
     setPhase('shell')
   }, [])
 
@@ -23,7 +23,7 @@ export default function App() {
         <LoadingSequence key="loading" onComplete={handleLoadingComplete} />
       )}
       {phase === 'welcome' && (
-        <WelcomeScreen key="welcome" onEnter={handleEnter} />
+        <WelcomeScreen key="welcome" onEnter={handleEnterWorkspace} />
       )}
       {phase === 'shell' && (
         <Shell key="shell" />

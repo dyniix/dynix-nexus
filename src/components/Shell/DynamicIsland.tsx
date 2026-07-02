@@ -1,13 +1,57 @@
 import { motion } from 'motion/react'
+import { useState, useEffect } from 'react'
+import { runtime } from '../../bridge'
 
-const MOCK_METRICS = [
-  { label: 'STATE', value: 'Idle', color: 'text-nexus-400' },
-  { label: 'QUEUE', value: '0', color: 'text-nexus-400' },
-  { label: 'GPU', value: '—', color: 'text-nexus-500' },
-  { label: 'MEM', value: '—', color: 'text-nexus-500' },
-]
+interface Metric {
+  label: string
+  value: string
+  color: string
+}
 
 export default function DynamicIsland() {
+  const [metrics, setMetrics] = useState<Metric[]>([
+    { label: 'STATE', value: '…', color: 'text-nexus-400' },
+    { label: 'QUEUE', value: '…', color: 'text-nexus-400' },
+    { label: 'GPU', value: '…', color: 'text-nexus-500' },
+    { label: 'MEM', value: '…', color: 'text-nexus-500' },
+  ])
+
+  useEffect(() => {
+    let mounted = true
+    const poll = async () => {
+      try {
+        const m = await runtime.getMetrics()
+        if (!mounted) return
+        setMetrics([
+          {
+            label: 'STATE',
+            value: m.state.toUpperCase(),
+            color: m.state === 'idle' ? 'text-nexus-400' : m.state === 'processing' ? 'text-cyan-400' : 'text-nexus-400',
+          },
+          { label: 'QUEUE', value: String(m.queueLength), color: 'text-nexus-400' },
+          {
+            label: 'GPU',
+            value: m.gpuUtilization !== null ? `${m.gpuUtilization}%` : '—',
+            color: m.gpuUtilization !== null ? 'text-nexus-400' : 'text-nexus-500',
+          },
+          {
+            label: 'MEM',
+            value: m.vramUsedMb !== null ? `${m.vramUsedMb}MB` : '—',
+            color: m.vramUsedMb !== null ? 'text-nexus-400' : 'text-nexus-500',
+          },
+        ])
+      } catch {
+        if (!mounted) return
+      }
+    }
+    poll()
+    const interval = setInterval(poll, 3000)
+    return () => {
+      mounted = false
+      clearInterval(interval)
+    }
+  }, [])
+
   return (
     <motion.div
       className="fixed top-4 left-1/2 -translate-x-1/2 z-40"
@@ -26,7 +70,7 @@ export default function DynamicIsland() {
         <div className="w-px h-4 bg-nexus-500" />
 
         <div className="flex items-center gap-4">
-          {MOCK_METRICS.map((m) => (
+          {metrics.map((m) => (
             <div key={m.label} className="flex items-center gap-1.5">
               <span className="text-[9px] font-mono tracking-[0.1em] text-nexus-500 uppercase">
                 {m.label}
