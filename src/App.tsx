@@ -27,10 +27,30 @@ export default function App() {
   }, [phase])
 
   const isEncoderRoute = location.pathname.startsWith('/encoder/')
+  const isStationRoute = location.pathname.startsWith('/station')
+  const isChroniclesRoute = location.pathname.startsWith('/chronicles')
+  const isMemoryRoute = location.pathname.startsWith('/memory')
+  const isLogsRoute = location.pathname.startsWith('/logs')
+  const isSettingsRoute = location.pathname.startsWith('/settings')
 
   if (isEncoderRoute) {
     const encoderType = location.pathname.split('/')[2]
     return <Shell active initialEncoder={encoderType} />
+  }
+  if (isStationRoute) {
+    return <Shell active initialEncoder="station" />
+  }
+  if (isChroniclesRoute) {
+    return <Shell active initialEncoder="chronicles" />
+  }
+  if (isMemoryRoute) {
+    return <Shell active initialEncoder="memory" />
+  }
+  if (isLogsRoute) {
+    return <Shell active initialEncoder="logs" />
+  }
+  if (isSettingsRoute) {
+    return <Shell active initialEncoder="settings" />
   }
 
   const shellActive = phase === 'transitioning' || phase === 'shell'

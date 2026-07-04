@@ -151,9 +151,10 @@ export default function DynamicIsland({ active: _active }: { active: boolean }) 
                 ? `0 0 28px ${cfg.color}22, 0 0 56px ${cfg.color}11, 0 0 80px ${cfg.color}08`
                 : '0 0 12px rgba(0, 217, 255, 0.04)',
           }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2, ease: EASE_OUT }}
+          animate={{ scale: [1, 1.012, 1] }}
+          whileHover={{ scale: 1.02, transition: { duration: 0.2, ease: EASE_OUT } }}
+          whileTap={{ scale: 0.98, transition: { duration: 0.1, ease: EASE_OUT } }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         >
           {/* Text optically centered — dot floats absolute to the left */}
           <div className="flex items-center justify-center px-6 py-[14px]">

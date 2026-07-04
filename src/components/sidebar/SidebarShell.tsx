@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import type { FC, SVGProps } from 'react'
 import { motion } from 'motion/react'
 import { SIDEBAR_PRIMARY, SIDEBAR_SYSTEM, MODULE_ICONS, getModuleAccent } from './sidebar.config'
 import CreatorLogo from './CreatorLogo'
@@ -88,6 +89,14 @@ export default function SidebarShell({
                 />
               )
             })}
+
+            {/* Home button */}
+            <SidebarIcon
+              icon={IconHome}
+              accent="#00D9FF"
+              isActive={activeModule === null}
+              onClick={() => onSelect(null)}
+            />
           </div>
 
           <div className="sidebar-dock-sep" />
@@ -163,3 +172,12 @@ function ExpandButton({ panelOpen, onToggle }: { panelOpen: boolean; onToggle: (
     </motion.button>
   )
 }
+
+/* ── Home Icon ── */
+
+const IconHome: FC<SVGProps<SVGSVGElement>> = (p) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={p.strokeWidth ?? 1.5} strokeLinecap="round" strokeLinejoin="round" className={p.className} style={p.style}>
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  )

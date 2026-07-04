@@ -9,6 +9,12 @@ interface SidebarIconProps {
   onClick: () => void
 }
 
+const breatheTransition = {
+  duration: 4,
+  repeat: Infinity,
+  ease: 'easeInOut' as const,
+}
+
 export default function SidebarIcon({
   icon: Icon, accent, isActive, onClick,
 }: SidebarIconProps) {
@@ -16,8 +22,10 @@ export default function SidebarIcon({
     <motion.button
       className="relative flex items-center justify-center w-10 h-10 rounded-[12px] cursor-pointer outline-none border-none bg-transparent select-none group"
       onClick={onClick}
-      whileHover={{ y: -1, transition: SPRING_HOVER }}
-      whileTap={{ scale: 0.92 }}
+      animate={{ scale: [1, 1.015, 1] }}
+      whileHover={{ y: -1, scale: 1.05, transition: SPRING_HOVER }}
+      whileTap={{ scale: 0.92, transition: { duration: 0.1 } }}
+      transition={breatheTransition}
     >
       {/* Background glow ring - visible on hover or active */}
       <motion.span

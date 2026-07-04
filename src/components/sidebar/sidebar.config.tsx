@@ -137,8 +137,8 @@ export const AI_MODULES: ModuleDef[] = [
 
 export const PANEL_SYSTEM_ITEMS: SystemDef[] = [
   { id: 'chronicles', title: 'Chronicles' },
-  { id: 'settings',   title: 'Settings' },
   { id: 'logs',       title: 'Logs' },
+  { id: 'settings',   title: 'Settings' },
 ]
 
 /* ── Sidebar Icon Order ── */
@@ -148,8 +148,8 @@ export type SidebarItem = ModuleDef | SystemDef
 export const SIDEBAR_PRIMARY: SidebarItem[] = [...PRIMARY_MODULES, ...AI_MODULES]
 export const SIDEBAR_SYSTEM: SidebarItem[] = [
   { id: 'chronicles', title: 'Chronicles' },
+  { id: 'logs',       title: 'Logs' },
   { id: 'settings',   title: 'Settings' },
-  { id: 'terminal',   title: 'Terminal' },
 ]
 
 /* ── Panel Sections ── */
@@ -163,4 +163,14 @@ export const PANEL_SECTIONS = {
 export function getModuleAccent(id: string): string {
   const all = [...PRIMARY_MODULES, ...AI_MODULES]
   return all.find(m => m.id === id)?.accent ?? '#00D9FF'
+}
+
+export function getSystemAccent(id: string): string {
+  const map: Record<string, string> = {
+    chronicles: '#00D9FF',
+    settings: '#64748B',
+    logs: '#8B5CF6',
+    terminal: '#10B981',
+  }
+  return map[id] ?? '#00D9FF'
 }

@@ -13,7 +13,7 @@ interface ModulePanelProps {
   activeModule: string | null
   panelOpen: boolean
   accent: string
-  onSelect: (id: string) => void
+  onSelect: (id: string | null) => void
   onClose: () => void
 }
 

@@ -147,12 +147,8 @@ export const videoConfig: EncoderConfig = {
     { label: 'Resolution', content: '1920 \u00d7 1080' },
     { label: 'FPS', content: '29.97' },
     { label: 'Codec', content: 'H.264' },
-    { label: 'Bitrate', content: '12.5 Mbps' },
-    { label: 'Aspect Ratio', content: '16:9' },
     { label: 'Scenes Detected', content: '14' },
     { label: 'Objects', content: 'Person, Car, Building, Tree, Sign', type: 'tags' },
-    { label: 'Audio Tracks', content: '1 (AAC, 48kHz)' },
-    { label: 'Subtitle Language', content: 'English' },
   ],
   logEntries: [
     { time: '11:42:10', message: 'Workspace Initialized', type: 'init' },
@@ -221,8 +217,6 @@ export const documentConfig: EncoderConfig = {
     { label: 'Tables', content: '3' },
     { label: 'Images', content: '7' },
     { label: 'Language', content: 'English' },
-    { label: 'Keywords', content: 'AI, Machine Learning, Data, Neural, Training', type: 'tags' },
-    { label: 'Document Type', content: 'Research Paper' },
   ],
   logEntries: [
     { time: '11:42:10', message: 'Workspace Initialized', type: 'init' },
@@ -284,10 +278,6 @@ export const audioConfig: EncoderConfig = {
     { label: 'Channels', content: '2 (Stereo)' },
     { label: 'Language', content: 'English' },
     { label: 'Detected Speakers', content: '2' },
-    { label: 'Loudness', content: '-14.2 LUFS' },
-    { label: 'BPM', content: '120' },
-    { label: 'Mood', content: 'Energetic, Upbeat', type: 'tags' },
-    { label: 'Genre', content: 'Electronic / Pop' },
   ],
   logEntries: [
     { time: '11:42:10', message: 'Workspace Initialized', type: 'init' },

@@ -202,7 +202,7 @@ function WorkflowArea({ config }: { config: EncoderConfig }) {
             AI Insights (Live)
           </span>
         </div>
-        <div className="flex-1 overflow-y-auto flex flex-col" style={{ height: 0 }}>
+        <div className="flex-1 overflow-y-auto flex flex-col" style={{ minHeight: 0 }}>
           {config.insightSections.map((section) => (
             <InsightRow key={section.label} section={section} accent={ACCENT} />
           ))}
