@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence } from 'motion/react'
+import { useLocation } from 'react-router-dom'
 import LoadingSequence from './components/Loading/LoadingSequence'
 import WelcomeScreen from './components/Welcome/WelcomeScreen'
 import Shell from './components/Shell/Shell'
@@ -7,6 +8,7 @@ import Shell from './components/Shell/Shell'
 type Phase = 'loading' | 'welcome' | 'transitioning' | 'shell'
 
 export default function App() {
+  const location = useLocation()
   const [phase, setPhase] = useState<Phase>('loading')
 
   const handleLoadingComplete = useCallback(() => {
@@ -24,33 +26,14 @@ export default function App() {
     }
   }, [phase])
 
-  const shellActive = phase === 'transitioning' || phase === 'shell'
+  const isEncoderRoute = location.pathname.startsWith('/encoder/')
 
-  /* ── TEMPORARY: Wheel event debug logger ──
-     Open DevTools console (F12), scroll over workspace cards.
-     The logged element is what's receiving the wheel event.
-     Tell me the tagName, className, and any dataset shown. */
-  useEffect(() => {
-    const handler = (e: WheelEvent) => {
-      const t = e.target as HTMLElement | null
-      if (!t) return
-      console.group('🐭 wheel target')
-      console.log('tagName:', t.tagName)
-      console.log('className:', t.className)
-      console.log('id:', t.id)
-      console.log('dataset:', JSON.stringify(t.dataset))
-      const parents: string[] = []
-      let p = t.parentElement
-      for (let i = 0; i < 5 && p; i++) {
-        parents.push(`${p.tagName}${p.id ? '#' + p.id : ''}${p.className ? '.' + p.className.split(' ').filter(Boolean).join('.') : ''}`)
-        p = p.parentElement
-      }
-      console.log('parents:', parents)
-      console.groupEnd()
-    }
-    window.addEventListener('wheel', handler, { passive: true })
-    return () => window.removeEventListener('wheel', handler)
-  }, [])
+  if (isEncoderRoute) {
+    const encoderType = location.pathname.split('/')[2]
+    return <Shell active initialEncoder={encoderType} />
+  }
+
+  const shellActive = phase === 'transitioning' || phase === 'shell'
 
   return (
     <div className="fixed inset-0 bg-nexus-900" style={{ overflow: 'clip' }}>

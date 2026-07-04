@@ -165,7 +165,7 @@ export default function NexusNetwork({ state, parallax }: NexusNetworkProps) {
     >
       <defs>
         <filter id="packet-glow">
-          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -173,18 +173,25 @@ export default function NexusNetwork({ state, parallax }: NexusNetworkProps) {
         </filter>
       </defs>
 
+      {/* Subtle ambient glow behind network — places it in space */}
+      <ellipse
+        cx="50%" cy="50%"
+        rx="45%" ry="35%"
+        fill={`${accentRgba}0.015)`}
+      />
+
       {/* ── Connections ── */}
-      <g opacity={0.06}>
+      <g opacity={0.12}>
         {CONNECTIONS.map((c, i) => {
           const from = NODES[c.from]
           const to = NODES[c.to]
-          const strokeW = Math.max(0.3, 0.7 - c.len * 0.01)
+          const strokeW = Math.max(0.4, 0.9 - c.len * 0.012)
           return (
             <line
               key={`conn-${i}`}
               x1={`${from.x}%`} y1={`${from.y}%`}
               x2={`${to.x}%`} y2={`${to.y}%`}
-              stroke={`rgba(255,255,255,${Math.max(0.02, 0.07 - c.len * 0.001)})`}
+              stroke={`rgba(255,255,255,${Math.max(0.04, 0.12 - c.len * 0.002)})`}
               strokeWidth={strokeW}
             />
           )
@@ -197,12 +204,12 @@ export default function NexusNetwork({ state, parallax }: NexusNetworkProps) {
           {/* Outer glow */}
           <circle
             cx={`${n.x}%`} cy={`${n.y}%`}
-            r={3}
-            fill={`${accentRgba}0.03)`}
+            r={3.5}
+            fill={`${accentRgba}0.06)`}
           >
             <animate
               attributeName="opacity"
-              values="0.3;0.7;0.3"
+              values="0.4;0.8;0.4"
               dur={`${3 + n.phase}s`}
               repeatCount="indefinite"
             />
@@ -210,20 +217,20 @@ export default function NexusNetwork({ state, parallax }: NexusNetworkProps) {
           {/* Core dot */}
           <circle
             cx={`${n.x}%`} cy={`${n.y}%`}
-            r={1.2}
-            fill={`rgba(255,255,255,${state === 'error' ? 0.08 : 0.06})`}
+            r={1.4}
+            fill={`rgba(255,255,255,${state === 'error' ? 0.14 : 0.10})`}
           >
             {/* Breathing */}
             <animate
               attributeName="r"
-              values="1;1.4;1"
+              values="1;1.6;1"
               dur={`${4 + n.phase * 0.5}s`}
               repeatCount="indefinite"
             />
             {/* Random twinkling */}
             <animate
               attributeName="opacity"
-              values="0.04;0.04;0.15;0.04;0.04"
+              values="0.08;0.08;0.25;0.08;0.08"
               keyTimes="0;0.1;0.12;0.14;1"
               dur={`${6 + n.twinkleDelay * 0.001}s`}
               repeatCount="indefinite"
@@ -244,7 +251,7 @@ export default function NexusNetwork({ state, parallax }: NexusNetworkProps) {
         return (
           <motion.circle
             key={`pkt-${packet.key}`}
-            r={1.8}
+            r={2.2}
             fill={accentColor}
             filter="url(#packet-glow)"
             initial={{

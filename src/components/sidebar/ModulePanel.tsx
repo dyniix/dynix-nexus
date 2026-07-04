@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import { panelReveal, fadeUp, staggerContainer } from './SidebarMotion'
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'motion/react'
+import Lenis from 'lenis'
+import { fadeUp, staggerContainer } from './SidebarMotion'
 import CreatorLogo from './CreatorLogo'
 import {
   MODULE_ICONS, PANEL_SECTIONS,
@@ -20,6 +21,38 @@ export default function ModulePanel({
   activeModule, panelOpen, accent, onSelect, onClose,
 }: ModulePanelProps) {
 
+  const [everOpened, setEverOpened] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (panelOpen && !everOpened) setEverOpened(true)
+  }, [panelOpen, everOpened])
+
+  useEffect(() => {
+    if (!panelOpen) return
+    const el = scrollRef.current
+    if (!el) return
+
+    const lenis = new Lenis({
+      wrapper: el,
+      content: el.children[0] as HTMLElement,
+      eventsTarget: el,
+      duration: 0.5,
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
+      autoResize: true,
+    })
+
+    function raf(time: number) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
+
+    return () => lenis.destroy()
+  }, [panelOpen])
+
   useEffect(() => {
     if (!panelOpen) return
     const handleKey = (e: KeyboardEvent) => {
@@ -30,101 +63,102 @@ export default function ModulePanel({
   }, [panelOpen, onClose])
 
   return (
-    <AnimatePresence>
-      {panelOpen && (
-        <motion.div
-          className="fixed z-40 pointer-events-none select-none"
-          style={{
-            left: 118,
-            top: '50%',
-            translate: '0 -50%',
-          }}
-          variants={panelReveal}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          <div
-            className="sidebar-panel pointer-events-auto overflow-y-auto"
-            style={{ width: 280, maxHeight: '82vh', minHeight: 580 }}
-          >
-            <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+    <motion.div
+      className="fixed z-40 pointer-events-none select-none"
+      initial={{ opacity: 0, scale: 1, x: 0 }}
+      animate={
+        panelOpen
+          ? { opacity: 1, scale: 1, x: 0 }
+          : everOpened
+            ? { opacity: 0, scale: 0.96, x: -8 }
+            : { opacity: 0, scale: 1, x: 0 }
+      }
+      transition={{ type: 'spring', stiffness: 450, damping: 32, mass: 0.7 }}
+      style={{ left: 118, top: '50%', translate: '0 -50%' }}
+    >
+      <div
+        ref={scrollRef}
+        className="sidebar-panel overflow-y-auto"
+        style={{
+          width: 280, maxHeight: '82vh', minHeight: 580,
+          pointerEvents: panelOpen ? 'auto' : 'none',
+        }}
+      >
+        <motion.div variants={staggerContainer} initial="hidden" animate={panelOpen ? 'visible' : 'hidden'}>
 
-              {/* ── Section 1: Identity Header ── */}
-              <motion.div variants={fadeUp} className="flex flex-col items-center pt-8 pb-6 px-5">
-                <div
-                  className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center flex-shrink-0 overflow-hidden relative mb-4"
-                  style={{
-                    background: `${accent}0d`,
-                    border: `1px solid ${accent}12`,
-                    boxShadow: `0 0 24px ${accent}14`,
-                  }}
-                >
-                  <span className="font-display text-2xl font-bold leading-none select-none" style={{ color: accent }}>
-                    DN
-                  </span>
-                </div>
-                <span className="text-[11px] font-semibold text-nexus-400 tracking-[0.12em] uppercase leading-tight">
-                  DYNIX NEXUS
-                </span>
-                <span className="text-[9px] font-medium text-nexus-500/60 tracking-wider mt-[3px]">
-                  AI COMMAND CENTER
-                </span>
-                <div className="flex items-center gap-1.5 mt-3">
-                  <span
-                    className="w-[6px] h-[6px] rounded-full animate-pulse"
-                    style={{ background: accent, boxShadow: `0 0 6px ${accent}`, opacity: 0.7 }}
-                  />
-                  <span className="text-[9px] font-mono text-nexus-500/50">Runtime Online</span>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="sidebar-panel-sep" />
-
-              {/* ── Section 2: Primary Modules (Image, Video, Document, Audio) ── */}
-              <ModuleSection
-                label="PRIMARY MODULES"
-                items={PANEL_SECTIONS.primary.items}
-                activeModule={activeModule}
-                onSelect={onSelect}
-                showStatus
+          {/* ── Section 1: Identity Header ── */}
+          <motion.div variants={fadeUp} className="flex flex-col items-center pt-8 pb-6 px-5">
+            <div
+              className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center flex-shrink-0 overflow-hidden relative mb-4"
+              style={{
+                background: `${accent}0d`,
+                border: `1px solid ${accent}12`,
+                boxShadow: `0 0 24px ${accent}14`,
+              }}
+            >
+              <span className="font-display text-2xl font-bold leading-none select-none" style={{ color: accent }}>
+                DN
+              </span>
+            </div>
+            <span className="text-[11px] font-semibold text-nexus-400 tracking-[0.12em] uppercase leading-tight">
+              DYNIX NEXUS
+            </span>
+            <span className="text-[9px] font-medium text-nexus-500/60 tracking-wider mt-[3px]">
+              AI COMMAND CENTER
+            </span>
+            <div className="flex items-center gap-1.5 mt-3">
+              <span
+                className="w-[6px] h-[6px] rounded-full animate-pulse"
+                style={{ background: accent, boxShadow: `0 0 6px ${accent}`, opacity: 0.7 }}
               />
+              <span className="text-[9px] font-mono text-nexus-500/50">Runtime Online</span>
+            </div>
+          </motion.div>
 
-              <motion.div variants={fadeUp} className="sidebar-panel-sep" />
+          <motion.div variants={fadeUp} className="sidebar-panel-sep" />
 
-              {/* ── Section 3: AI Modules (Memory Junction, Station Manager) ── */}
-              <ModuleSection
-                label="AI MODULES"
-                items={PANEL_SECTIONS.ai.items}
-                activeModule={activeModule}
-                onSelect={onSelect}
-                showStatus
-              />
+          {/* ── Section 2: Primary Modules (Image, Video, Document, Audio) ── */}
+          <ModuleSection
+            label="PRIMARY MODULES"
+            items={PANEL_SECTIONS.primary.items}
+            activeModule={activeModule}
+            onSelect={onSelect}
+            showStatus
+          />
 
-              <motion.div variants={fadeUp} className="sidebar-panel-sep" />
+          <motion.div variants={fadeUp} className="sidebar-panel-sep" />
 
-              {/* ── Section 4: System (Chronicles, Settings, Logs) ── */}
-              <SystemSection
-                items={PANEL_SECTIONS.system.items}
-                activeModule={activeModule}
-                onSelect={onSelect}
-              />
+          {/* ── Section 3: AI Modules (Memory Junction, Station Manager) ── */}
+          <ModuleSection
+            label="AI MODULES"
+            items={PANEL_SECTIONS.ai.items}
+            activeModule={activeModule}
+            onSelect={onSelect}
+            showStatus
+          />
 
-              <motion.div variants={fadeUp} className="sidebar-panel-sep" />
+          <motion.div variants={fadeUp} className="sidebar-panel-sep" />
 
-              {/* ── Section 5: Creator Bottom Widget ── */}
-              <motion.div variants={fadeUp}>
-                <CreatorSection />
-              </motion.div>
+          {/* ── Section 4: System (Chronicles, Settings, Logs) ── */}
+          <SystemSection
+            items={PANEL_SECTIONS.system.items}
+            activeModule={activeModule}
+            onSelect={onSelect}
+          />
 
-              {/* Bottom breathing space */}
-              <div className="h-4" />
+          <motion.div variants={fadeUp} className="sidebar-panel-sep" />
 
-            </motion.div>
-          </div>
+          {/* ── Section 5: Creator Bottom Widget ── */}
+          <motion.div variants={fadeUp}>
+            <CreatorSection />
+          </motion.div>
+
+          {/* Bottom breathing space */}
+          <div className="h-4" />
+
         </motion.div>
-      )}
-    </AnimatePresence>
+      </div>
+    </motion.div>
   )
 }
 

@@ -127,26 +127,26 @@ function ExpandButton({ panelOpen, onToggle }: { panelOpen: boolean; onToggle: (
         height: 36,
         borderRadius: 18,
         background: hovered || panelOpen
-          ? 'linear-gradient(180deg, rgba(16,16,16,0.95), rgba(10,10,10,0.98))'
-          : 'linear-gradient(180deg, rgba(10,10,10,0.8), rgba(8,8,8,0.85))',
+          ? 'linear-gradient(180deg, rgba(20,20,20,0.96), rgba(12,12,12,0.98))'
+          : 'linear-gradient(180deg, rgba(16,16,16,0.88), rgba(10,10,10,0.92))',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         border: '1px solid',
         borderColor: panelOpen
-          ? 'rgba(0,217,255,0.12)'
+          ? 'rgba(0,217,255,0.18)'
           : hovered
-            ? 'rgba(255,255,255,0.06)'
-            : 'rgba(255,255,255,0.03)',
+            ? 'rgba(255,255,255,0.10)'
+            : 'rgba(255,255,255,0.07)',
         boxShadow: panelOpen
-          ? '0 0 12px rgba(0,217,255,0.08), 0 0 4px rgba(0,217,255,0.04)'
+          ? '0 0 16px rgba(0,217,255,0.10), 0 0 6px rgba(0,217,255,0.05)'
           : hovered
-            ? '0 0 8px rgba(0,217,255,0.04)'
-            : 'none',
+            ? '0 0 10px rgba(0,217,255,0.06)'
+            : '0 0 6px rgba(0,217,255,0.02)',
         color: panelOpen
           ? '#00D9FF'
           : hovered
-            ? 'rgba(255,255,255,0.5)'
-            : 'rgba(255,255,255,0.15)',
+            ? 'rgba(255,255,255,0.6)'
+            : 'rgba(255,255,255,0.35)',
         transition: 'background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
       }}
       onMouseEnter={() => setHovered(true)}

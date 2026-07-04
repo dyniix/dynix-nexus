@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import Lenis from 'lenis'
 
 const EASE = [0.25, 1, 0.5, 1] as const
 const EASE_OUT = [0.16, 1, 0.3, 1] as const
@@ -59,23 +60,57 @@ const itemV = {
 
 export default function DynamicIsland({ active: _active }: { active: boolean }) {
   const [expanded, setExpanded] = useState(false)
+  const [everExpanded, setEverExpanded] = useState(false)
   const [hovered, setHovered] = useState(false)
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!expanded) return
+    const el = scrollRef.current
+    if (!el) return
+
+    const lenis = new Lenis({
+      wrapper: el,
+      content: el.children[0] as HTMLElement,
+      eventsTarget: el,
+      duration: 0.5,
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
+      autoResize: true,
+    })
+
+    function raf(time: number) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
+
+    return () => lenis.destroy()
+  }, [expanded])
 
   const handleClick = useCallback(() => {
     setExpanded(p => !p)
+    if (!expanded) setEverExpanded(true)
     setHovered(false)
-  }, [])
+  }, [expanded])
 
   return (
     <>
-      {/* Backdrop dim — no blur (blur causes scroll lag on glass panels) */}
+      {/* Preload backdrop-filter shader — always compiled, GPU ready */}
+      <div aria-hidden style={{ position: 'fixed', left: -9999, top: -9999, width: 1, height: 1, backdropFilter: 'blur(5px)' }} />
+
+      {/* Backdrop blur + dim — blur pre-compiled, opacity toggles only */}
       <motion.div
         className="fixed inset-0 z-40 pointer-events-none"
         animate={{ opacity: expanded ? 1 : 0 }}
         transition={{ duration: 0.24, ease: EASE }}
         style={{
-          background: 'rgba(0, 0, 0, 0.18)',
-          willChange: 'opacity',
+          background: 'rgba(0, 0, 0, 0.15)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+          willChange: 'backdrop-filter, opacity',
         }}
       />
 
@@ -93,14 +128,16 @@ export default function DynamicIsland({ active: _active }: { active: boolean }) 
         }}
       />
 
-      {/* ── Island + Panel — optically centered, always in DOM ── */}
+      {/* ── Island + Panel — optically centered, always in DOM ──
+           pointer-events:none on wrapper so this fixed z-50 layer
+           does NOT steal wheel events from workspace content below. */}
       <div
-        className="fixed top-3 z-50 flex flex-col items-center"
+        className="fixed top-3 z-50 flex flex-col items-center pointer-events-none"
         style={{ left: '50%', transform: 'translateX(-50%)' }}
       >
         {/* ── Island Pill — static shape, no layout animation ── */}
         <motion.div
-          className="dynix-glass-premium rounded-full select-none"
+          className="dynix-glass-premium rounded-full select-none pointer-events-auto"
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           onClick={handleClick}
@@ -151,9 +188,19 @@ export default function DynamicIsland({ active: _active }: { active: boolean }) 
           </div>
         </motion.div>
 
-        {/* ── Runtime Panel — pre-rendered, scaleY controls visibility ── */}
+        {/* ── Runtime Panel — pre-rendered at full scale from mount ──
+             First expand: only opacity animates (content already compiled).
+             Subsequent collapses use scaleY. */}
         <motion.div
           className="dynix-glass-premium"
+          initial={{ opacity: 0, scaleY: 1 }}
+          animate={
+            expanded
+              ? { opacity: 1, scaleY: 1 }
+              : everExpanded
+                ? { opacity: 0, scaleY: 0 }
+                : { opacity: 0, scaleY: 1 }
+          }
           style={{
             width: PANEL_W,
             borderRadius: '16px',
@@ -163,81 +210,82 @@ export default function DynamicIsland({ active: _active }: { active: boolean }) 
             pointerEvents: expanded ? 'auto' : 'none',
             willChange: 'transform, opacity',
           }}
-          animate={{ opacity: expanded ? 1 : 0, scaleY: expanded ? 1 : 0 }}
           transition={{ duration: 0.35, ease: EASE }}
         >
-          <motion.div
-            className="p-6 pt-5 space-y-5"
-            variants={containerV}
-            initial="hidden"
-            animate={expanded ? 'show' : 'hidden'}
-          >
-            {/* System Cards */}
-            <motion.div className="grid grid-cols-4 gap-3" variants={itemV}>
-              <SysCard label="Runtime" value="Online" sub="v0.1 Alpha" dot />
-              <GpuCard />
-              <MemCard />
-              <QueueCard />
-            </motion.div>
+          <div ref={scrollRef} className="overflow-y-auto" style={{ maxHeight: '70vh' }}>
+            <motion.div
+              className="p-6 pt-5 space-y-5"
+              variants={containerV}
+              initial="hidden"
+              animate={expanded ? 'show' : 'hidden'}
+            >
+              {/* System Cards */}
+              <motion.div className="grid grid-cols-4 gap-3" variants={itemV}>
+                <SysCard label="Runtime" value="Online" sub="v0.1 Alpha" dot />
+                <GpuCard />
+                <MemCard />
+                <QueueCard />
+              </motion.div>
 
-            {/* Module Cards */}
-            <motion.div className="grid grid-cols-4 gap-3" variants={itemV}>
-              {MODULES.map((mod) => {
-                const st = MOD_STATE[mod.state]
-                return (
-                  <div key={mod.name} className="rounded-xl bg-nexus-800/50 border border-nexus-700/40 p-3">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
-                      <span className="text-[10px] font-mono text-nexus-300 tracking-wide">{mod.name}</span>
-                    </div>
-                    <div className={`text-[9px] font-mono ${st.text} mb-0.5`}>{st.label}</div>
-                    <div className="text-[9px] font-mono text-nexus-500 leading-tight">{mod.desc}</div>
-                  </div>
-                )
-              })}
-            </motion.div>
-
-            {/* Timeline + Performance */}
-            <motion.div className="grid grid-cols-2 gap-3" variants={itemV}>
-              <div className="rounded-xl bg-nexus-800/50 border border-nexus-700/40 p-3.5">
-                <div className="text-[8px] font-mono text-nexus-500 tracking-[0.15em] uppercase mb-2.5">Recent Events</div>
-                <div className="space-y-0">
-                  {TIMELINE.map((entry, i) => (
-                    <div key={i} className="flex items-start gap-3 relative pb-2.5 last:pb-0">
-                      {i < TIMELINE.length - 1 && <div className="absolute left-[5px] top-[10px] bottom-0 w-px bg-nexus-700" />}
-                      <div className={`w-2.5 h-2.5 rounded-full border-2 flex-shrink-0 mt-0.5 ${i === 0 ? 'border-cyan-400/40 bg-cyan-400/20' : 'border-nexus-600 bg-transparent'}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[11px] font-mono text-nexus-300 leading-snug">{entry.event}</div>
-                        <div className="text-[9px] font-mono text-nexus-500 mt-0.5">{entry.time}</div>
+              {/* Module Cards */}
+              <motion.div className="grid grid-cols-4 gap-3" variants={itemV}>
+                {MODULES.map((mod) => {
+                  const st = MOD_STATE[mod.state]
+                  return (
+                    <div key={mod.name} className="rounded-xl bg-nexus-800/50 border border-nexus-700/40 p-3">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                        <span className="text-[10px] font-mono text-nexus-300 tracking-wide">{mod.name}</span>
                       </div>
+                      <div className={`text-[9px] font-mono ${st.text} mb-0.5`}>{st.label}</div>
+                      <div className="text-[9px] font-mono text-nexus-500 leading-tight">{mod.desc}</div>
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-xl bg-nexus-800/50 border border-nexus-700/40 p-3.5">
-                <div className="text-[8px] font-mono text-nexus-500 tracking-[0.15em] uppercase mb-2.5">Performance</div>
-                <div className="space-y-2.5">
-                  <PerfRow label="GPU" value={81} color="bg-cyan-400/60" />
-                  <PerfRow label="Memory" value={64} color="bg-cyan-400/40" />
-                  <PerfRow label="CPU" value={12} color="bg-green-500/40" />
-                </div>
-              </div>
-            </motion.div>
+                  )
+                })}
+              </motion.div>
 
-            {/* Actions */}
-            <motion.div className="grid grid-cols-4 gap-3" variants={itemV}>
-              {ACTIONS.map((a) => (
-                <button key={a.id} className="dynix-card-utility p-2.5 flex items-center gap-2.5 cursor-pointer hover:bg-nexus-700/30 transition-colors duration-150">
-                  <span className="text-sm text-nexus-400 flex-shrink-0">{a.icon}</span>
-                  <span className="text-[10px] font-mono text-nexus-400 tracking-wide">{a.label}</span>
-                </button>
-              ))}
-            </motion.div>
+              {/* Timeline + Performance */}
+              <motion.div className="grid grid-cols-2 gap-3" variants={itemV}>
+                <div className="rounded-xl bg-nexus-800/50 border border-nexus-700/40 p-3.5">
+                  <div className="text-[8px] font-mono text-nexus-500 tracking-[0.15em] uppercase mb-2.5">Recent Events</div>
+                  <div className="space-y-0">
+                    {TIMELINE.map((entry, i) => (
+                      <div key={i} className="flex items-start gap-3 relative pb-2.5 last:pb-0">
+                        {i < TIMELINE.length - 1 && <div className="absolute left-[5px] top-[10px] bottom-0 w-px bg-nexus-700" />}
+                        <div className={`w-2.5 h-2.5 rounded-full border-2 flex-shrink-0 mt-0.5 ${i === 0 ? 'border-cyan-400/40 bg-cyan-400/20' : 'border-nexus-600 bg-transparent'}`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[11px] font-mono text-nexus-300 leading-snug">{entry.event}</div>
+                          <div className="text-[9px] font-mono text-nexus-500 mt-0.5">{entry.time}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-nexus-800/50 border border-nexus-700/40 p-3.5">
+                  <div className="text-[8px] font-mono text-nexus-500 tracking-[0.15em] uppercase mb-2.5">Performance</div>
+                  <div className="space-y-2.5">
+                    <PerfRow label="GPU" value={81} color="bg-cyan-400/60" />
+                    <PerfRow label="Memory" value={64} color="bg-cyan-400/40" />
+                    <PerfRow label="CPU" value={12} color="bg-green-500/40" />
+                  </div>
+                </div>
+              </motion.div>
 
-            <motion.div className="text-[8px] font-mono text-nexus-600 text-center tracking-wider" variants={itemV}>
-              runtime v0.1 alpha
+              {/* Actions */}
+              <motion.div className="grid grid-cols-4 gap-3" variants={itemV}>
+                {ACTIONS.map((a) => (
+                  <button key={a.id} className="dynix-card-utility p-2.5 flex items-center gap-2.5 cursor-pointer hover:bg-nexus-700/30 transition-colors duration-150">
+                    <span className="text-sm text-nexus-400 flex-shrink-0">{a.icon}</span>
+                    <span className="text-[10px] font-mono text-nexus-400 tracking-wide">{a.label}</span>
+                  </button>
+                ))}
+              </motion.div>
+
+              <motion.div className="text-[8px] font-mono text-nexus-600 text-center tracking-wider" variants={itemV}>
+                runtime v0.1 alpha
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </>
