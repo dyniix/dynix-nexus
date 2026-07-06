@@ -122,7 +122,6 @@ function ProgressArea() {
 
 function EmptyProgress({ config }: { config: EncoderProviderConfig }) {
   const ACCENT_RGB = config.accentRgb
-  const ACCENT = config.accent
   return (
     <motion.div
       className="flex flex-col items-center justify-center gap-1 w-full h-full relative select-none"
@@ -243,7 +242,6 @@ function QueuePanel() {
               isSelected={f.id === state.selectedId}
               onSelect={() => selectFile(f.id)}
               onRemove={() => removeFile(f.id)}
-              accent={config.accent}
               accentRgb={config.accentRgb}
             />
           ))}
@@ -273,12 +271,11 @@ function EmptyQueue({ config }: { config: EncoderProviderConfig }) {
   )
 }
 
-function QueueItem({ file, isSelected, onSelect, onRemove, accent, accentRgb }: {
+function QueueItem({ file, isSelected, onSelect, onRemove, accentRgb }: {
   file: UploadedFile
   isSelected: boolean
   onSelect: () => void
   onRemove: () => void
-  accent: string
   accentRgb: string
 }) {
   return (

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'motion/react'
 import {
   Image, Eye, FolderOpen,
@@ -163,7 +163,6 @@ function WorkflowArea({ config }: { config: EncoderConfig }) {
   const { selectedFile } = useEncoder()
   const ACCENT = config.accent
   const ACCENT_RGB = config.accentRgb
-  const c = (o: number) => col(ACCENT_RGB, o)
 
   return (
     <motion.div className="flex gap-5 flex-1" style={{ minHeight: 320 }} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }} initial="hidden" animate="show">
@@ -204,7 +203,7 @@ function WorkflowArea({ config }: { config: EncoderConfig }) {
         </div>
         <div className="flex-1 overflow-y-auto flex flex-col" style={{ minHeight: 0 }}>
           {config.insightSections.map((section) => (
-            <InsightRow key={section.label} section={section} accent={ACCENT} />
+            <InsightRow key={section.label} section={section} />
           ))}
           <div className="flex-1 min-h-[4px]" />
           <SummaryButton accent={ACCENT} />
@@ -222,7 +221,7 @@ function ActivePreview({ file, config }: { file: UploadedFile; config: EncoderCo
   const c = (o: number) => col(ACCENT_RGB, o)
 
   if (file.type.startsWith('video/')) {
-    return <VideoPreview file={file} accent={ACCENT} accentRgb={ACCENT_RGB} />
+    return <VideoPreview file={file} accentRgb={ACCENT_RGB} />
   }
   if (file.type.startsWith('audio/')) {
     return <AudioPreview file={file} accent={ACCENT} accentRgb={ACCENT_RGB} />
@@ -262,9 +261,8 @@ function ActivePreview({ file, config }: { file: UploadedFile; config: EncoderCo
 }
 
 /* ─── Video Preview ─── */
-function VideoPreview({ file, accent, accentRgb }: { file: UploadedFile; accent: string; accentRgb: string }) {
+function VideoPreview({ file, accentRgb }: { file: UploadedFile; accentRgb: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [loaded, setLoaded] = useState(false)
   const c = (o: number) => col(accentRgb, o)
 
   return (
@@ -279,7 +277,7 @@ function VideoPreview({ file, accent, accentRgb }: { file: UploadedFile; accent:
           style={{ objectFit: 'contain' }}
           controls
           preload="metadata"
-          onLoadedData={() => setLoaded(true)}
+          onLoadedData={() => {}}
         />
       </div>
       <div className="flex items-center gap-3 mt-2.5 px-1 flex-shrink-0">
@@ -388,7 +386,6 @@ interface PipelineNodeData {
 }
 
 function PipelineNodeRow({ node, index, accent }: { node: PipelineNodeData; index: number; accent: string }) {
-  const isLast = false
 
   const icon = node.status === 'done' ? (
     <div className="w-[18px] h-[18px] rounded-full flex items-center justify-center" style={{ background: 'rgba(52,211,153,0.12)', border: '1.5px solid #34D399' }}>
@@ -444,7 +441,7 @@ function PipelineNodeRow({ node, index, accent }: { node: PipelineNodeData; inde
 }
 
 /* ─── Insight Row ─── */
-function InsightRow({ section, accent }: { section: InsightSection; accent: string }) {
+function InsightRow({ section }: { section: InsightSection }) {
   if (section.type === 'palette') {
     return (
       <div className="py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.025)' }}>

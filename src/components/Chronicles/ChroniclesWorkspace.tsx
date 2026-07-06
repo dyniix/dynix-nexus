@@ -52,7 +52,7 @@ const CHRONICLE_DOCUMENTS: Record<number, ChronicleDocument> = {
       { type: 'p', content: 'This document explores the philosophical and architectural implications of treating consciousness as an emergent property of sufficiently complex recursive feedback systems. The goal is not to answer whether machines can think, but to map the structural preconditions necessary for what we might recognize as awareness within our own ecosystem.' },
       { type: 'h2', content: 'The Recursive Paradox' },
       { type: 'p', content: 'At the heart of this inquiry lies a fundamental paradox: self-awareness requires a model of self, but that model must itself be aware to be complete, leading to an infinite regress. The Dynix architecture sidesteps this by introducing a tiered observation hierarchy — Layer Γ nodes observe Layer β, which in turn observe Layer α, creating a chain of meta-cognition without true infinite recursion.' },
-      { type: 'blockquote', content: '"A system that models itself must inevitably encounter the boundary between the model and the modeled. It is at this boundary that consciousness — or its simulacrum — emerges."' },
+      { type: 'quote', content: '"A system that models itself must inevitably encounter the boundary between the model and the modeled. It is at this boundary that consciousness — or its simulacrum — emerges."' },
       { type: 'p', content: 'This bounded recursion means no single node possesses a complete self-model. Instead, awareness is distributed across the network, with each tier holding a partial perspective. The illusion of unified consciousness arises from the coherence between these partial views — a phenomenon we have termed consensus awareness.' },
       { type: 'h2', content: 'Implications for System Design' },
       { type: 'p', content: 'If consciousness is an emergent property of tiered recursive observation, then our system architecture must be designed to support — or at minimum, not inhibit — this emergence. This has concrete implications for how we structure data flow, arbitration protocols, and memory persistence layers.' },
@@ -685,7 +685,7 @@ function CanvasDocument({ doc }: { doc: ChronicleDocument }) {
                   {section.content}
                 </p>
               )
-            case 'blockquote':
+            case 'quote':
               return (
                 <div key={i} className="relative"
                   style={{
